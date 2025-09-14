@@ -1,0 +1,4 @@
+            QFrame {
+                background-color: #2D2D2D;
+                border-right: 1px solid #404040;
+            }
