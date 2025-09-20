@@ -13,6 +13,8 @@ from pages.tools.milling_machine_widget import MillingMachineWidget
 from pages.tools.square_border_widget import SquareBorderWidget
 from pages.tools.car import CartWidget
 
+from pages.tools.robot_position import GetRobotPosition
+
 class PaintObjects(QWidget):
     def __init__(self):
         super().__init__()
@@ -95,6 +97,10 @@ class TrackingPage(BasePage):
         self.canvas.addRobot(self.robot_widget_4)
         self.canvas.addRobot(self.robot_widget_5)
 
+        self.car_to_stanok_1 = False
+            
+        self.car_to_stanok_2  = False
+
         main_layout.addWidget(self.canvas, 1)
         control_layout = QHBoxLayout()
         main_layout.addLayout(control_layout)
@@ -108,7 +114,7 @@ class TrackingPage(BasePage):
         # Таймер для движения роботов
         self.update_timer_2 = QTimer()
         self.update_timer_2.timeout.connect(self.randomMovementRobot)  # Подключаем вашу функцию
-        self.update_timer_2.start(1000)  # 2000 миллисекунд = 2 секунды
+        self.update_timer_2.start(3000)  # 2000 миллисекунд = 2 секунды
 
         # Таймер для движения тележек
         self.cart_movement_timer = QTimer()
@@ -134,11 +140,14 @@ class TrackingPage(BasePage):
             (self.x_robot + int(self.separator_x / 2) - 200, self.y_robot - 100),  # Вверх до 1 робота
 
             (self.x_robot - 50 , self.y_robot - 100),  # Станок 1
-
+            (self.x_robot - 50 , self.y_robot - 100),  # Станок 1
+            (self.x_robot - 50 , self.y_robot - 100),  # Станок 1
             (self.x_robot - 50 , self.y_robot - 100),  # Станок 1
 
             (self.x_robot - 50 + self.separator_x , self.y_robot - 100),  # Станок 2
-
+            (self.x_robot - 50 + self.separator_x , self.y_robot - 100),  # Станок 2
+            (self.x_robot - 50 + self.separator_x , self.y_robot - 100),  # Станок 2
+            (self.x_robot - 50 + self.separator_x , self.y_robot - 100),  # Станок 2
             (self.x_robot - 50 + self.separator_x , self.y_robot - 100),  # Станок 2
 
             (self.x_robot - 250, self.y_robot - 100),  # Влево
@@ -171,57 +180,53 @@ class TrackingPage(BasePage):
             # Переходим к следующей точке маршрута
             self.cart.route_index = (self.cart.route_index + 1) % len(first_cart_positions)
 
-            if self.cart.route_index == 7 or self.cart.route_index == len(first_cart_positions):
+            if self.cart.route_index == 6 or self.cart.route_index == len(first_cart_positions):
+                self.car_to_stanok_1 = True
                 while self.cart.workpieces:
                         self.cart.remove_workpiece()
 
             if self.cart.route_index == 9:
-                for _ in range(6):
-                        self.cart.add_workpiece("standard")
+                self.car_to_stanok_2 = True
 
+            if self.cart.route_index == 11:
+                for _ in range(4):
+                        self.cart.add_workpiece("standard")
+                
+                
+                
+            if self.cart.route_index == 12:
+                self.car_to_stanok_2 = False
 
             
         
 
     def randomMovementRobot(self):
         list_robot = [self.robot_widget_1, self.robot_widget_2, self.robot_widget_3, self.robot_widget_4, self.robot_widget_5]
-        pose = {
-                1: [
-                    45,
-                    90,
-                    90,  #началка
-                    180,
-                    0
-                ],
-                2: [
-                    45,
-                    45,
-                    45,  #левый стол
-                    200,
-                    0
-                ],
-                3: [
-                    20,
-                    -80, #станок
-                    70,
-                    130,
-                    0
-                ],
-                4: [
-                    -80,
-                    0,
-                    -10, #правый стол
-                    135,
-                    0
-                ],
 
-            }
-        for robot in list_robot:
-            robot.set_target_pose(pose[self.index])
-            robot.set_gripper_openness(random.random())
-        if self.index == 4:
-            self.index = 1
-        self.index = self.index +1
+        self.robot_widget_1.set_target_pose(self.get_robot_position.getPoseRobot1())
+        self.robot_widget_2.set_target_pose(self.get_robot_position.getPoseRobot2())
+        self.robot_widget_3.set_target_pose(self.get_robot_position.getPoseRobot3())
+        self.robot_widget_4.set_target_pose(self.get_robot_position.getPoseRobot4())
+        self.robot_widget_5.set_target_pose(self.get_robot_position.getPoseRobot5())
+
+        self.robot_widget_1.set_gripper_openness(self.get_robot_position.getGripperRobot1())
+        
+        if self.car_to_stanok_1:
+            self.get_robot_position.updatePoseRobot1()
+
+        if self.car_to_stanok_2:    
+            self.get_robot_position.updatePoseRobot2()
+        self.get_robot_position.updatePoseRobot3()
+        self.get_robot_position.updatePoseRobot4()
+        self.get_robot_position.updatePoseRobot5()
+
+       
+        # for robot in list_robot:
+        #     robot.set_target_pose(pose[self.index])
+        #     robot.set_gripper_openness(random.random())
+        # if self.index == 4:
+        #     self.index = 1
+        # self.index = self.index +1
 
 
    
@@ -233,6 +238,8 @@ class TrackingPage(BasePage):
         self.robot_widget_3 = RobotWidget(self.x_robot + self.separator_x * 2, self.y_robot)
         self.robot_widget_4 = RobotWidget(self.x_robot + int(self.separator_x / 2), self.y_robot +  self.separator_y )
         self.robot_widget_5 = RobotWidget(self.x_robot + int(self.separator_x * 1.5) , self.y_robot +  self.separator_y)
+
+        self.get_robot_position = GetRobotPosition()
 
 
 

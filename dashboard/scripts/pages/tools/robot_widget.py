@@ -14,21 +14,21 @@ class RobotWidget(QLabel):
         self.coordinate_x =coordinate_x
         
         # Параметры кинематической цепи
-        self.joint_angles = [0, 45, -30, 0, 0]
-        self.target_angles = [0, 45, -30, 0, 0]
+        self.joint_angles = [45,90,90,  180, 0]
+        self.target_angles = [45,90,90,  180, 0]
         self.gripper_openness = 0.5  # 0.0 - закрыт, 1.0 - открыт
         
         # Таймер анимации
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_animation)
-        self.timer.start(50)
+        self.timer.start(30)
 
     def update_animation(self):
         # Плавная интерполяция углов
         for i in range(len(self.joint_angles)):
             diff = self.target_angles[i] - self.joint_angles[i]
             if abs(diff) > 0.5:
-                self.joint_angles[i] += diff * 0.08
+                self.joint_angles[i] += diff * 0.03
         self.update()
 
     def set_target_pose(self, new_angles):
