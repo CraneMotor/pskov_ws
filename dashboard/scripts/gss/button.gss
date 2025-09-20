@@ -7,7 +7,7 @@ QPushButton:hover {
                 background-color: #334d66ff; /* Цвет при наведении */
             }
 QPushButton:pressed {
-                background-color: #FF5722;; /* Цвет при нажатии */
+                background-color: rgba(62, 26, 92, 1);; /* Цвет при нажатии */
             }
 
           

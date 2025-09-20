@@ -202,7 +202,7 @@ class TaskPage(BasePage):
         part_combo.setFont(self.arial_12)
 
         stanok_combo = QComboBox(parent)
-        stanok_combo.addItems(["Станок A", "Станок B", "Станок C", "Станок D", "Станок E"])
+        stanok_combo.addItems(["Станок 1", "Станок 2", "Станок 3", "Станок 4", "Станок 5"])
         stanok_combo.setGeometry(50 + 200 + 50, 750 + 50 + self.separator_labels, 200, self.height_labels)
         stanok_combo.setStyleSheet(Path("/home/cranemotor/workspace/pskov_ws/dashboard/scripts/gss/combo_box.gss").read_text())
         stanok_combo.setFont(self.arial_12)

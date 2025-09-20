@@ -180,8 +180,9 @@ class TrackingPage(BasePage):
             # Переходим к следующей точке маршрута
             self.cart.route_index = (self.cart.route_index + 1) % len(first_cart_positions)
 
-            if self.cart.route_index == 6 or self.cart.route_index == len(first_cart_positions):
+            if self.cart.route_index == 6 or self.cart.route_index == len(first_cart_positions) - 1:
                 self.car_to_stanok_1 = True
+                self.update_status("status_1", "Выполняется", QColor(147,112,216))
                 while self.cart.workpieces:
                         self.cart.remove_workpiece()
 
@@ -210,7 +211,11 @@ class TrackingPage(BasePage):
         self.robot_widget_5.set_target_pose(self.get_robot_position.getPoseRobot5())
 
         self.robot_widget_1.set_gripper_openness(self.get_robot_position.getGripperRobot1())
-        
+        self.robot_widget_2.set_gripper_openness(self.get_robot_position.getGripperRobot2())
+        self.robot_widget_3.set_gripper_openness(self.get_robot_position.getGripperRobot3())
+        self.robot_widget_4.set_gripper_openness(self.get_robot_position.getGripperRobot4())
+        self.robot_widget_5.set_gripper_openness(self.get_robot_position.getGripperRobot5())
+
         if self.car_to_stanok_1:
             self.get_robot_position.updatePoseRobot1()
 
@@ -221,15 +226,8 @@ class TrackingPage(BasePage):
         self.get_robot_position.updatePoseRobot5()
 
        
-        # for robot in list_robot:
-        #     robot.set_target_pose(pose[self.index])
-        #     robot.set_gripper_openness(random.random())
-        # if self.index == 4:
-        #     self.index = 1
-        # self.index = self.index +1
 
 
-   
 
     def createRobots(self):
         # Создаем роботов
@@ -332,4 +330,59 @@ class TrackingPage(BasePage):
             zone_label.move(x - 30, y)  # Центрируем по x
             zone_label.adjustSize()
             self.stanok_labels.append(zone_label)
+
+
+
+        self.status_labels = {}  # Словарь для хранения статус-меток
+        
+        status_labels_info = [
+            (self.x_robot + 60, self.y_robot + 180, "Ожидание", QColor(49, 155, 207), "status_1"),
+            (self.x_robot + self.separator_x + 60, self.y_robot + 180, "Завершено", QColor(0, 160, 63), "status_2"),
+            (self.x_robot + 2 * self.separator_x + 60, self.y_robot + 180, "Выполняется", QColor(147,112,216), "status_3"),
+            (self.x_robot + int(self.separator_x / 2) + 60, self.y_robot + self.separator_y + 180, "Ошибка", QColor(200, 40, 40), "status_4"),
+            (self.x_robot + int(self.separator_x * 1.5) + 60, self.y_robot + self.separator_y + 180, "Выполняется", QColor(147,112,216), "status_5"),
+        ]
+        
+        for x, y, text, color, label_id in status_labels_info:
+            status_label = QLabel(text, self.canvas)
+            status_label.setStyleSheet(f"""
+                QLabel {{
+                    color: rgb({color.red()}, {color.green()}, {color.blue()});
+                    background-color: rgba(0, 0, 0, 0);
+                    font-size: 16px;
+                    font-weight: bold;    
+                }}
+            """)
+            
+            status_label.move(x - 20, y + 10)
+            status_label.adjustSize()
+            
+            # Сохраняем метку в словарь
+            self.status_labels[label_id] = status_label
+            self.stanok_labels.append(status_label)
+
+    def update_status(self, label_id, new_status, new_color=None):
+        """Обновить статус и цвет метки"""
+        if label_id not in self.status_labels:
+            print(f"Метка с ID {label_id} не найдена!")
+            return
+        
+        label = self.status_labels[label_id]
+        
+        # Обновляем текст
+        label.setText(new_status)
+        
+        # Обновляем цвет если указан
+        if new_color:
+            label.setStyleSheet(f"""
+                QLabel {{
+                    color: rgb({new_color.red()}, {new_color.green()}, {new_color.blue()});
+                    background-color: rgba(0, 0, 0, 0);
+                    font-size: 16px;
+                    font-weight: bold;    
+                }}
+            """)
+        
+        # Пересчитываем размер после изменения текста
+        label.adjustSize()
 

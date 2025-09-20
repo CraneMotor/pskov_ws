@@ -46,25 +46,58 @@ class GetRobotPosition:
     }
 
     robot_2_poses = {
-                0: [-0,     -120,     20,     180,    0],
-                1: [-100,     -120,     20,     180,    0],
+                0: [-0,     -120,     20,     180,    0], # Со стола взять
+                1: [-100,     -120,     20,     180,    0], # На тележку
+                
             }
     
+    gripper_2_poses = {
+                0: -1.0,     # Со стола взять
+                1: 0.0,     # На тележку
+    }
+    
     robot_3_poses = {
-                0: [45,     45,     45,     200,    0],
-                1: [20,     -40,    50,     135,    0],
-                2: [20,     -40,    50,     135,    0],
-                3: [20,     -40,    50,     135,    0],
-                4: [-80,    0,      -10,    135,    0],
+                0: [45,     45,     45,     200,    0], # Со стола взять
+                1: [20,     -40,    50,     135,    0], # В станок
+                2: [20,     -40,    50,     135,    0], # В станок
+                3: [20,     -40,    50,     135,    0], # В станок
+                4: [-80,    0,      -10,    135,    0], # На готовый стол
+                5: [-80,    0,      -10,    135,    0], # На готовый стол
             }
+    
+    gripper_3_poses = {
+                0: -1.0,     # Со стола взять
+                1: -1.0,     # На тележку
+                2: 0.0,     # На тележку
+                3: -1.0,     # На тележку
+                4: -1.0,     # # На готовый стол
+                5: -0.0,     # # На готовый стол
+    }
+
     robot_4_poses = {0: [45,-90,45,  200, 0]}
+    gripper_4_poses = { 0: 0.0}
+
     robot_5_poses = {
-                0: [45,     45,     45,     200,    0],
+                0: [45,     45,     45,     200,    0], # Со стола взять
                 1: [45,     -120,    120,     135,    0],
                 2: [45,     -120,    120,     135,    0],
-                3: [-70,     -120,    120,     135,    0],
-                4: [-70,     -70,    70,     135,    0],
+                3: [45,     -120,    120,     135,    0],
+                4: [45,     -120,    120,     135,    0],
+                5: [45,     -120,    120,     135,    0],
+                6: [-70,     -120,    120,     135,    0],
+                7: [-70,     -70,    70,     135,    0],
             }
+    gripper_5_poses = {
+                0: -1.0,     # Со стола взять
+                1: -1.0,     # На тележку
+                2: 0.0,     # На тележку
+                3: 0.0,     # На тележку
+                4: 0.0,     # На тележку
+                5: -1.0,     # На тележку
+                6: -1.0,     # # На готовый стол
+                7: -0.0,     # # На готовый стол
+    }
+
     
     
     def __init__(self):
@@ -78,17 +111,37 @@ class GetRobotPosition:
     def getGripperRobot1(self):
         return self.gripper_1_poses[self.robot_1_index]
 
+    ###
+
     def getPoseRobot2(self):
         return self.robot_2_poses[self.robot_2_index]
+    
+    def getGripperRobot2(self):
+        return self.gripper_2_poses[self.robot_2_index]
+    
+    ###
 
     def getPoseRobot3(self):
         return self.robot_3_poses[self.robot_3_index]
+    
+    def getGripperRobot3(self):
+        return self.gripper_3_poses[self.robot_3_index]
+    
+    ###
 
     def getPoseRobot4(self):
         return self.robot_4_poses[self.robot_4_index]
+    
+    def getGripperRobot4(self):
+        return self.gripper_4_poses[self.robot_4_index]
+    
+    ###
 
     def getPoseRobot5(self):
         return self.robot_5_poses[self.robot_5_index]
+    
+    def getGripperRobot5(self):
+        return self.gripper_5_poses[self.robot_5_index]
     
 
     def updatePoseRobot1(self):
