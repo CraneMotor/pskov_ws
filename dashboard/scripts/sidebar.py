@@ -1,95 +1,4 @@
 
-# from PyQt5.QtWidgets import (
-#     QFrame, QVBoxLayout, QListWidget, QPushButton, QSpacerItem, QSizePolicy
-# )
-# from PyQt5.QtCore import pyqtSignal
-# from PyQt5.QtGui import QColor
-# from pathlib import Path
-
-# # Левое боковое меню
-# class Sidebar(QFrame):
-#     tab_changed = pyqtSignal(int)  # Сигнал при изменении вкладки
-#     stop_pressed = pyqtSignal()    # Новый сигнал для кнопки СТОП
-
-#     def __init__(self):
-#         super().__init__()
-#         self.setupUI()
-
-#     def setupUI(self):
-#         self.setFixedWidth(250)
-#         self.setStyleSheet(Path("/home/cranemotor/workspace/pskov_ws/dashboard/scripts/gss/sidebar.gss").read_text())
-        
-#         layout = QVBoxLayout(self)
-#         layout.setSpacing(10)
-#         layout.setContentsMargins(10, 20, 10, 20)
-
-#         self.tab_list = QListWidget()
-#         self.tab_list.setStyleSheet(Path("/home/cranemotor/workspace/pskov_ws/dashboard/scripts/gss/tab_style.gss").read_text())
-        
-#         tabs = ["Мониторинг", "Задачи", "Настройки"]
-        
-#         for tab in tabs:
-#             self.tab_list.addItem(tab)
-        
-#         layout.addWidget(self.tab_list)
-
-#         # Добавляем растягивающийся спейсер
-#         layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
-
-#         # Создаем красную кнопку СТОП
-#         self.stop_button = QPushButton("E-STOP")
-#         self.stop_button.setStyleSheet("""
-#             QPushButton {
-#                 background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-#                                                 stop: 0 #FF5555, stop: 1 #CC0000);
-#                 color: white;
-#                 font-size: 20px;
-#                 font-weight: bold;
-#                 border: 3px solid #AA0000;
-#                 border-radius: 15px;
-#                 padding: 20px;
-#                 margin: 15px;
-#                 text-transform: uppercase;
-#             }
-#             QPushButton:hover {
-#                 background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-#                                                 stop: 0 #FF7777, stop: 1 #DD0000);
-#                 border: 3px solid #BB0000;
-#             }
-#             QPushButton:pressed {
-#                 background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-#                                                 stop: 0 #CC0000, stop: 1 #AA0000);
-#                 border: 3px solid #990000;
-#                 padding: 22px 20px 18px 20px;
-#             }
-#             QPushButton:disabled {
-#                 background-color: #888888;
-#                 border: 3px solid #666666;
-#                 color: #CCCCCC;
-#             }
-#         """)
-
-
-        
-#         # Подключаем сигнал нажатия кнопки
-#         self.stop_button.clicked.connect(self.on_stop_pressed)
-        
-#         # Добавляем кнопку в layout
-#         layout.addWidget(self.stop_button)
-
-#         self.tab_list.currentRowChanged.connect(self.tab_changed.emit)
-
-#     def on_stop_pressed(self):
-#         """Обработчик нажатия кнопки СТОП"""
-#         print("Кнопка СТОП нажата!")
-#         self.stop_pressed.emit()  # Отправляем сигнал
-
-#     def set_stop_button_enabled(self, enabled):
-#         """Включить/выключить кнопку СТОП"""
-#         self.stop_button.setEnabled(enabled)
-
-
-
 from PyQt5.QtWidgets import (
     QFrame, QVBoxLayout, QListWidget, QPushButton, QSpacerItem, 
     QSizePolicy, QLabel, QHBoxLayout
@@ -112,14 +21,14 @@ class Sidebar(QFrame):
 
     def setupUI(self):
         self.setFixedWidth(250)
-        self.setStyleSheet(Path("/home/cranemotor/workspace/pskov_ws/dashboard/scripts/gss/sidebar.gss").read_text())
+        self.setStyleSheet(Path("gss/sidebar.gss").read_text())
         
         layout = QVBoxLayout(self)
         layout.setSpacing(10)
         layout.setContentsMargins(10, 20, 10, 20)
 
         self.tab_list = QListWidget()
-        self.tab_list.setStyleSheet(Path("/home/cranemotor/workspace/pskov_ws/dashboard/scripts/gss/tab_style.gss").read_text())
+        self.tab_list.setStyleSheet(Path("gss/tab_style.gss").read_text())
         
         tabs = ["Мониторинг", "Задачи", "Настройки"]
         
