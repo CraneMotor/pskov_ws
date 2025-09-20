@@ -14,16 +14,16 @@ class Sidebar(QFrame):
 
     def setupUI(self):
         self.setFixedWidth(250)
-        self.setStyleSheet(Path("gss/sidebar.gss").read_text())
+        self.setStyleSheet(Path("/home/cranemotor/workspace/pskov_ws/dashboard/scripts/gss/sidebar.gss").read_text())
         
         layout = QVBoxLayout(self)
         layout.setSpacing(10)
         layout.setContentsMargins(10, 20, 10, 20)
 
         self.tab_list = QListWidget()
-        self.tab_list.setStyleSheet(Path("gss/tab_style.gss").read_text())
+        self.tab_list.setStyleSheet(Path("/home/cranemotor/workspace/pskov_ws/dashboard/scripts/gss/tab_style.gss").read_text())
         
-        tabs = ["Главная страница", "Задачи", "Отслеживание","Настройки"]
+        tabs = ["Мониторинг", "Задачи","Настройки"]
         
         for tab in tabs:
             self.tab_list.addItem(tab)

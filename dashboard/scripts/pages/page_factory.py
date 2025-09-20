@@ -8,11 +8,11 @@ class PageFactory:
     @staticmethod
     def createPage(page_index, page_name):
         if page_index == 0:
-            return MainPage()
+            return TrackingPage()
         elif page_index == 1:
             return TaskPage()
         elif page_index == 2:
-            return TrackingPage()
+            return MainPage()
         else:
             from .base_page import BasePage
             return BasePage(page_name)

@@ -45,7 +45,7 @@ class RobotWidget(QLabel):
     def draw_realistic_robot(self, painter, x, y, angles):
         painter.save()
         painter.translate(x, y)
-        painter.scale(0.6, 0.6)  # Масштаб для встраивания
+        painter.scale(0.5, 0.5)  # Масштаб для встраивания
         
         # Основные цвета
         arm_red = QColor(200, 50, 50)

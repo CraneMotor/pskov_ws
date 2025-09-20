@@ -4,7 +4,7 @@ from PyQt5.QtGui import QPainter, QPen, QColor
 from PyQt5.QtCore import Qt
 
 class SquareBorderWidget:
-    def __init__(self, center_x, center_y, side_length, border_color=QColor(100, 100, 200), border_width=4):
+    def __init__(self, center_x, center_y, side_length, border_color=QColor(117, 62, 218), border_width=1.5):
         self.center_x = center_x
         self.center_y = center_y
         self.side_length = side_length

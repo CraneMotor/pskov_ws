@@ -20,7 +20,7 @@ class BasePage(QWidget):
 
         # Геометрия
         self.height_labels = 50
-        self.separator_labels = 20
+        self.separator_labels = 70
 
         self.setupUI()
 

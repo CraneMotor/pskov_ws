@@ -13,7 +13,7 @@ QListWidget::item {
             
 QListWidget::item:selected {
                 background-color: #404040;
-                border-left: 10px solid #FF5722;
+                border-left: 10px solid rgba(117, 62, 218, 1);
 }
 
 QListWidget::item:hover {
