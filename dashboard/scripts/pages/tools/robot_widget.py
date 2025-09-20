@@ -21,7 +21,7 @@ class RobotWidget(QLabel):
         # Таймер анимации
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_animation)
-        self.timer.start(30)
+        self.timer.start(50)
 
     def update_animation(self):
         # Плавная интерполяция углов

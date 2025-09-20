@@ -9,19 +9,22 @@ class CartWidget:
     def __init__(self, start_x, start_y):
         self.x = start_x
         self.y = start_y
-        self.width = 60
-        self.height = 40
-        self.speed = 2
+        self.width = 80
+        self.height = 60
+        self.speed = 5
         self.target_x = start_x
         self.target_y = start_y
         self.is_moving = False
         self.current_zone = 0
-        self.wheel_rotation = 0
+        self.direction = "right"  # Направление движения: "right", "left", "up", "down"
         
-        # Таймер для анимации движения и вращения колес
+        # Таймер для анимации движения
         self.animation_timer = QTimer()
         self.animation_timer.timeout.connect(self.animate)
         self.animation_timer.start(50)  # Обновление каждые 50 мс
+        
+        # Заготовки на тележке
+        self.workpieces = []
         
     def set_target(self, target_x, target_y, zone_number):
         self.target_x = target_x
@@ -29,94 +32,147 @@ class CartWidget:
         self.is_moving = True
         self.current_zone = zone_number
         
-    def animate(self):
-        # Анимируем вращение колес
-        self.wheel_rotation = (self.wheel_rotation + 10) % 360
+        # Определяем направление движения
+        if abs(target_x - self.x) > abs(target_y - self.y):
+            self.direction = "right" if target_x > self.x else "left"
+        else:
+            self.direction = "down" if target_y > self.y else "up"
         
+    def add_workpiece(self, workpiece_type="standard"):
+        """Добавить заготовку на тележку"""
+        self.workpieces.append(workpiece_type)
+        
+    def remove_workpiece(self):
+        """Убрать заготовку с тележки"""
+        if self.workpieces:
+            return self.workpieces.pop()
+        return None
+        
+    def animate(self):
         if self.is_moving:
-            # Вычисляем направление движения
-            dx = self.target_x - self.x
-            dy = self.target_y - self.y
-            distance = math.sqrt(dx*dx + dy*dy)
-            
-            if distance > self.speed:
-                # Двигаемся к цели
-                self.x += (dx / distance) * self.speed
-                self.y += (dy / distance) * self.speed
-            else:
-                # Достигли цели
-                self.x = self.target_x
-                self.y = self.target_y
-                self.is_moving = False
+            # Движение только по прямым углам
+            if self.direction == "right":
+                if self.x < self.target_x:
+                    self.x += self.speed
+                else:
+                    self.x = self.target_x
+                    self.is_moving = False
+                    
+            elif self.direction == "left":
+                if self.x > self.target_x:
+                    self.x -= self.speed
+                else:
+                    self.x = self.target_x
+                    self.is_moving = False
+                    
+            elif self.direction == "down":
+                if self.y < self.target_y:
+                    self.y += self.speed
+                else:
+                    self.y = self.target_y
+                    self.is_moving = False
+                    
+            elif self.direction == "up":
+                if self.y > self.target_y:
+                    self.y -= self.speed
+                else:
+                    self.y = self.target_y
+                    self.is_moving = False
                 
     def draw_cart(self, painter):
         painter.save()
         painter.translate(int(self.x), int(self.y))
         
-        # Рисуем корпус тележки
+        # Рисуем корпус тележки (вид сверху)
         self.draw_cart_body(painter)
         
-        # Рисуем колеса
-        self.draw_wheels(painter)
+        # Рисуем заготовки
+        self.draw_workpieces(painter)
         
-        # Рисуем ручку
-        self.draw_handle(painter)
+        # Рисуем стрелку направления
+        self.draw_direction_indicator(painter)
         
         painter.restore()
         
     def draw_cart_body(self, painter):
-        # Градиент для корпуса тележки
-        body_gradient = QLinearGradient(0, 0, 0, self.height)
-        body_gradient.setColorAt(0, QColor(200, 50, 50))    # Красный
-        body_gradient.setColorAt(1, QColor(150, 30, 30))    # Темно-красный
+        # Основной корпус тележки (вид сверху)
+        body_gradient = QLinearGradient(0, 0, self.width, self.height)
+        body_gradient.setColorAt(0, QColor(100, 100, 150))    # Сине-серый
+        body_gradient.setColorAt(1, QColor(70, 70, 120))      # Темный сине-серый
         
         painter.setBrush(QBrush(body_gradient))
-        painter.setPen(QPen(QColor(100, 20, 20), 2))
+        painter.setPen(QPen(QColor(50, 50, 80), 2))
         
-        # Рисуем основной корпус
-        painter.drawRoundedRect(5, 10, self.width - 10, self.height - 15, 8, 8)
+        # Рисуем прямоугольный корпус
+        painter.drawRect(0, 0, self.width, self.height)
         
-        # Рисуем верхнюю часть
-        painter.drawRect(15, 5, self.width - 30, 10)
+        # Добавляем детали для объема
+        painter.setPen(QPen(QColor(120, 120, 170), 1))
+        painter.drawRect(5, 5, self.width - 10, self.height - 10)
         
-    def draw_wheels(self, painter):
-        # Сохраняем состояние для вращения колес
-        painter.save()
+        # Металлические углы
+        painter.setBrush(QBrush(QColor(180, 180, 200)))
+        painter.setPen(QPen(QColor(150, 150, 180), 1))
+        painter.drawRect(0, 0, 8, 8)  # Левый верхний
+        painter.drawRect(self.width - 8, 0, 8, 8)  # Правый верхний
+        painter.drawRect(0, self.height - 8, 8, 8)  # Левый нижний
+        painter.drawRect(self.width - 8, self.height - 8, 8, 8)  # Правый нижний
         
-        # Левое колесо
-        painter.translate(15, self.height - 5)
-        painter.rotate(self.wheel_rotation)
-        self.draw_wheel(painter)
-        painter.restore()
+    def draw_workpieces(self, painter):
+        """Рисуем заготовки на тележке"""
+        if not self.workpieces:
+            return
+            
+        painter.setBrush(QBrush(QColor(200, 150, 100)))  # Цвет металла
+        painter.setPen(QPen(QColor(150, 100, 70), 1))
         
-        # Правое колесо
-        painter.save()
-        painter.translate(self.width - 15, self.height - 5)
-        painter.rotate(self.wheel_rotation)
-        self.draw_wheel(painter)
-        painter.restore()
+        # Рисуем заготовки в виде прямоугольников
+        for i, workpiece in enumerate(self.workpieces):
+            if i < 4:  # Максимум 4 заготовки для визуализации
+                row = i // 2
+                col = i % 2
+                
+                x_pos = 15 + col * 20
+                y_pos = 10 + row * 15
+                
+                # Разные типы заготовок
+                if workpiece == "large":
+                    painter.drawRect(x_pos, y_pos, 18, 12)
+                else:  # standard
+                    painter.drawRect(x_pos, y_pos, 15, 10)
+                
+                # Добавляем детали на заготовки
+                painter.setPen(QPen(QColor(180, 180, 200), 1))
+                painter.drawLine(x_pos + 3, y_pos + 2, x_pos + 12, y_pos + 2)
+                painter.drawLine(x_pos + 3, y_pos + 8, x_pos + 12, y_pos + 8)
+                painter.setPen(QPen(QColor(150, 100, 70), 1))
         
-    def draw_wheel(self, painter):
-        # Внешняя часть колеса
-        painter.setBrush(QBrush(QColor(50, 50, 50)))
-        painter.setPen(QPen(QColor(30, 30, 30), 2))
-        painter.drawEllipse(-8, -8, 16, 16)
+    def draw_direction_indicator(self, painter):
+        """Рисуем стрелку направления движения"""
+        if not self.is_moving:
+            return
+            
+        painter.setPen(QPen(QColor(0, 255, 0), 2))  # Зеленая стрелка
         
-        # Внутренняя часть колеса (ступица)
-        painter.setBrush(QBrush(QColor(100, 100, 100)))
-        painter.drawEllipse(-4, -4, 8, 8)
+        center_x = self.width // 2
+        center_y = self.height // 2
         
-        # Спицы
-        painter.setPen(QPen(QColor(200, 200, 200), 1))
-        for i in range(0, 360, 45):
-            painter.drawLine(0, 0, 6 * math.cos(math.radians(i)), 6 * math.sin(math.radians(i)))
-        
-    def draw_handle(self, painter):
-        painter.setPen(QPen(QColor(80, 80, 80), 3))
-        # Ручка тележки
-        painter.drawLine(self.width // 2, 5, self.width // 2 + 20, -15)
-        painter.drawLine(self.width // 2 + 20, -15, self.width // 2 + 40, -10)
-        
-        # Ручка на конце
-        painter.setPen(QPen(QColor(60, 60, 60), 4))
-        painter.drawLine(self.width // 2 + 35, -12, self.width // 2 + 45, -8)
+        if self.direction == "right":
+            painter.drawLine(center_x, center_y, self.width - 5, center_y)
+            painter.drawLine(self.width - 10, center_y - 5, self.width - 5, center_y)
+            painter.drawLine(self.width - 10, center_y + 5, self.width - 5, center_y)
+            
+        elif self.direction == "left":
+            painter.drawLine(center_x, center_y, 5, center_y)
+            painter.drawLine(10, center_y - 5, 5, center_y)
+            painter.drawLine(10, center_y + 5, 5, center_y)
+            
+        elif self.direction == "down":
+            painter.drawLine(center_x, center_y, center_x, self.height - 5)
+            painter.drawLine(center_x - 5, self.height - 10, center_x, self.height - 5)
+            painter.drawLine(center_x + 5, self.height - 10, center_x, self.height - 5)
+            
+        elif self.direction == "up":
+            painter.drawLine(center_x, center_y, center_x, 5)
+            painter.drawLine(center_x - 5, 10, center_x, 5)
+            painter.drawLine(center_x + 5, 10, center_x, 5)

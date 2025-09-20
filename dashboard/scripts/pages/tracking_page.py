@@ -11,6 +11,7 @@ from pages.tools.robot_widget import RobotWidget
 from pages.tools.table_widget import TableWidget
 from pages.tools.milling_machine_widget import MillingMachineWidget
 from pages.tools.square_border_widget import SquareBorderWidget
+from pages.tools.car import CartWidget
 
 class PaintObjects(QWidget):
     def __init__(self):
@@ -19,6 +20,7 @@ class PaintObjects(QWidget):
         self.tables = []
         self.milling_machines = []  
         self.square_borders = []
+        self.carts = []
   
     def addRobot(self, robot):
         self.robots.append(robot)
@@ -32,6 +34,9 @@ class PaintObjects(QWidget):
     def addSquareBorder(self, square_border):
         self.square_borders.append(square_border)
 
+    def addCart(self, cart):  
+        self.carts.append(cart)
+
         
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -43,6 +48,9 @@ class PaintObjects(QWidget):
         
         for machine in self.milling_machines:
             machine.draw_milling_machine(painter)
+
+        for cart in self.carts:
+            cart.draw_cart(painter)
 
         for robot in self.robots:
             robot.draw_realistic_robot(painter, robot.coordinate_x, robot.coordinate_y, robot.joint_angles)
@@ -78,6 +86,7 @@ class TrackingPage(BasePage):
         self.createTables()
         self.createMillingMachines()
         self.createSquareBorders()
+        self.createCarts()
         self.createLabels()
 
         self.canvas.addRobot(self.robot_widget_1)
@@ -89,34 +98,130 @@ class TrackingPage(BasePage):
         main_layout.addWidget(self.canvas, 1)
         control_layout = QHBoxLayout()
         main_layout.addLayout(control_layout)
+        self.index = 1
         
         # Таймер для обновления холста и анимации станков
         self.update_timer = QTimer()
         self.update_timer.timeout.connect(self.canvas.update)
         self.update_timer.start(30)
 
-        # Создаем таймер
+        # Таймер для движения роботов
         self.update_timer_2 = QTimer()
         self.update_timer_2.timeout.connect(self.randomMovementRobot)  # Подключаем вашу функцию
-        self.update_timer_2.start(2000)  # 2000 миллисекунд = 2 секунды
+        self.update_timer_2.start(1000)  # 2000 миллисекунд = 2 секунды
 
+        # Таймер для движения тележек
+        self.cart_movement_timer = QTimer()
+        self.cart_movement_timer.timeout.connect(self.moveCarts)
+        self.cart_movement_timer.start(3000)  # Движение каждые 3 секунды
+
+
+    def createCarts(self):
+        self.cart = CartWidget(self.x_robot + int(self.separator_x / 2) + 50, self.y_robot + self.separator_y + 450)
+        self.canvas.addCart(self.cart)
+
+    def moveCarts(self):
+        """Управление движением тележек с конкретными положениями для первой тележки"""
+
+        first_cart_positions = [
+             # Маршрут от зоны загрузки к станкам и обратно
+            (self.x_robot + int(self.separator_x / 2) + 50, self.y_robot + self.separator_y + 450),  # Зона загрузки
+
+            (self.x_robot + int(self.separator_x / 2) + 50, self.y_robot + self.separator_y + 230),  # Вверх на 150
+
+            (self.x_robot + int(self.separator_x / 2) - 515, self.y_robot + self.separator_y + 200),  # Влево на 700
+
+            (self.x_robot + int(self.separator_x / 2) - 200, self.y_robot - 100),  # Вверх до 1 робота
+
+            (self.x_robot - 50 , self.y_robot - 100),  # Станок 1
+
+            (self.x_robot - 50 , self.y_robot - 100),  # Станок 1
+
+            (self.x_robot - 50 + self.separator_x , self.y_robot - 100),  # Станок 2
+
+            (self.x_robot - 50 + self.separator_x , self.y_robot - 100),  # Станок 2
+
+            (self.x_robot - 250, self.y_robot - 100),  # Влево
+
+            (self.x_robot - 250, self.y_robot + 600),  # Вниз
+
+            (self.x_robot + 700, self.y_robot + 600),  # Вправо
+
+            (self.x_robot + 700, self.y_robot + 800),  # Вниз
+
+            (self.x_robot + 700, self.y_robot + 600),  # Вверх
+
+            (self.x_robot + 300, self.y_robot + 600),  # Влево
+
+        ]
+      
+         
+        if not self.cart.is_moving:
+            # Получаем следующую точку маршрута
+            if not hasattr(self.cart, 'route_index'):
+                self.cart.route_index = 0
+                for _ in range(4):
+                        self.cart.add_workpiece("standard")
+                
+
+            
+            target_x, target_y = first_cart_positions[self.cart.route_index]
+            self.cart.set_target(target_x, target_y, (self.cart.route_index % 5) + 1)
+            
+            # Переходим к следующей точке маршрута
+            self.cart.route_index = (self.cart.route_index + 1) % len(first_cart_positions)
+
+            if self.cart.route_index == 7 or self.cart.route_index == len(first_cart_positions):
+                while self.cart.workpieces:
+                        self.cart.remove_workpiece()
+
+            if self.cart.route_index == 9:
+                for _ in range(6):
+                        self.cart.add_workpiece("standard")
+
+
+            
+        
 
     def randomMovementRobot(self):
         list_robot = [self.robot_widget_1, self.robot_widget_2, self.robot_widget_3, self.robot_widget_4, self.robot_widget_5]
+        pose = {
+                1: [
+                    45,
+                    90,
+                    90,  #началка
+                    180,
+                    0
+                ],
+                2: [
+                    45,
+                    45,
+                    45,  #левый стол
+                    200,
+                    0
+                ],
+                3: [
+                    20,
+                    -80, #станок
+                    70,
+                    130,
+                    0
+                ],
+                4: [
+                    -80,
+                    0,
+                    -10, #правый стол
+                    135,
+                    0
+                ],
+
+            }
         for robot in list_robot:
-            new_angles = [
-                # random.randint(-60, 60),
-                # random.randint(20, 100),
-                # random.randint(-80, -10),
-                # random.randint(-45, 45),
-                # 0,
-                # 20,
-                # -80, станок
-                # 0,
-                # 0
-            ]
-            robot.set_target_pose(new_angles)
+            robot.set_target_pose(pose[self.index])
             robot.set_gripper_openness(random.random())
+        if self.index == 4:
+            self.index = 1
+        self.index = self.index +1
 
 
    
@@ -220,3 +325,4 @@ class TrackingPage(BasePage):
             zone_label.move(x - 30, y)  # Центрируем по x
             zone_label.adjustSize()
             self.stanok_labels.append(zone_label)
+
